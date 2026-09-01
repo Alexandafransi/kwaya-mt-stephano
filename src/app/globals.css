@@ -1,26 +1,110 @@
 @import "tailwindcss";
 
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
+  --surface: #faf6ee;
+  --surface-alt: #f0e8d8;
+  --card: #ffffff;
+  --content: #1a1512;
+  --content-soft: #2a231d;
+  --brand-orange-dark: #b25709;
+}
+
+/* Dark mode: the body surfaces swap to the same ink/cream pairing already
+   used for the header, footer, and hero bands, so the whole page reads as
+   one consistent identity instead of a separate dark palette. Toggled via
+   [data-theme] on <html> (see ThemeProvider) rather than prefers-color-scheme
+   alone, so visitors can override the OS setting. */
+:root[data-theme="dark"] {
+  --surface: #17130f;
+  --surface-alt: #221c16;
+  --card: #241e17;
+  --content: #faf6ee;
+  --content-soft: #e4d9c4;
+  /* Brighter than the light-mode value so orange link/accent text stays
+     readable at ~4.5:1 against the dark card/surface tones above. */
+  --brand-orange-dark: #e8862c;
+}
+
+* {
+  transition: background-color 160ms ease, border-color 160ms ease, color 160ms ease;
 }
 
 @theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
-}
+  --color-background: var(--surface);
+  --color-foreground: var(--content);
+  --font-sans: var(--font-inter);
+  --font-serif: var(--font-playfair);
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
+  /* Fixed brand chrome — header, footer, hero bands */
+  --color-ink: #17130f;
+  --color-ink-soft: #2a231d;
+  --color-cream: #faf6ee;
+  --color-cream-dark: #f0e8d8;
+  --color-brand-orange: #d9720c;
+  --color-brand-orange-dark: var(--brand-orange-dark);
+  --color-brand-gold: #e8b923;
+  --color-brand-gold-soft: #f5d97a;
+
+  --color-surface: var(--surface);
+  --color-surface-alt: var(--surface-alt);
+  --color-card: var(--card);
+  --color-content: var(--content);
+  --color-content-soft: var(--content-soft);
 }
 
 body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  background: var(--surface);
+  color: var(--content);
+  font-family: var(--font-sans), Arial, Helvetica, sans-serif;
+}
+
+.font-serif-display {
+  font-family: var(--font-serif), Georgia, serif;
+}
+
+@keyframes fade-in-up {
+  from {
+    opacity: 0;
+    transform: translateY(16px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.animate-fade-in-up {
+  animation: fade-in-up 0.7s ease-out both;
+}
+
+::selection {
+  background: var(--color-brand-gold-soft);
+  color: var(--color-ink);
+}
+
+.text-balance {
+  text-wrap: balance;
+}
+
+/* Subtle film-grain texture for dark brand chrome (header/footer/hero bands),
+   giving flat color a tactile, printed feel instead of a flat CSS gradient. */
+.grain-overlay {
+  position: relative;
+  isolation: isolate;
+}
+
+.grain-overlay::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  opacity: 0.05;
+  mix-blend-mode: overlay;
+  background-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg"><filter id="n"><feTurbulence type="fractalNoise" baseFrequency="0.85" numOctaves="2" stitchTiles="stitch"/></filter><rect width="100%25" height="100%25" filter="url(%23n)"/></svg>');
+}
+
+/* Thin gold hairline rule used to flank section eyebrows and as an ornamental divider */
+.rule-gold {
+  height: 1px;
+  background: linear-gradient(90deg, transparent, var(--color-brand-gold), transparent);
 }
