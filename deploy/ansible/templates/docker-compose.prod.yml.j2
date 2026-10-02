@@ -11,7 +11,10 @@ services:
       - proxy
     labels:
       - traefik.enable=true
-      - traefik.http.routers.kwaya-app.rule=Host(`{{ app_domain }}`) || Host(`www.{{ app_domain }}`)
+      # Only the apex host: there is no www.{{ app_domain }} DNS record, and
+      # including it made Let's Encrypt fail the HTTP-01 challenge for that
+      # name, which blocked the certificate for the whole router.
+      - traefik.http.routers.kwaya-app.rule=Host(`{{ app_domain }}`)
       - traefik.http.routers.kwaya-app.entrypoints=websecure
       - traefik.http.routers.kwaya-app.tls.certresolver=letsencrypt
       - traefik.http.services.kwaya-app.loadbalancer.server.port=3000
