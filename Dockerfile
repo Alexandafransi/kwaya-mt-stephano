@@ -7,7 +7,13 @@ RUN npm ci
 # --- Build ---
 FROM node:22-alpine AS builder
 WORKDIR /app
-ARG NEXT_PUBLIC_API_URL=http://localhost:8001
+# The browser calls the API cross-origin, so this must be an absolute URL
+# and is baked into the bundle at build time. Defaulting to the PRODUCTION
+# origin on purpose: an image built without the build arg then still works
+# in production, whereas a localhost default silently ships a bundle that
+# can only talk to a developer's own machine. Local `npm run dev` reads
+# .env.local directly and never goes through this Dockerfile.
+ARG NEXT_PUBLIC_API_URL=https://kpb.kezmak.co.tz
 ENV NEXT_PUBLIC_API_URL=$NEXT_PUBLIC_API_URL
 COPY --from=deps /app/node_modules ./node_modules
 COPY . .

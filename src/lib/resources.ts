@@ -23,6 +23,9 @@ export type FieldConfig = {
   // instead — an empty string isn't a valid int/date, but `null` isn't
   // accepted either when the column disallows it.
   nullable?: boolean;
+  // Override the file input's `accept` attribute (type "image"/"file" only).
+  // Defaults to "image/*" for images and unrestricted for plain files.
+  accept?: string;
 };
 
 export type ResourceConfig = {
@@ -241,12 +244,20 @@ export const committeesResource: ResourceConfig = {
 };
 
 // ---------- Songs ----------
-export type Song = { id: number; category: number; title: string; youtubeId: string | null; order: number };
+export type Song = {
+  id: number;
+  category: number;
+  title: string;
+  youtubeId: string | null;
+  audioFile: string | null;
+  order: number;
+};
 export const adaptSong = (raw: Record<string, unknown>): Song => ({
   id: raw.id as number,
   category: raw.category as number,
   title: raw.title as string,
   youtubeId: (raw.youtube_id as string) || null,
+  audioFile: (raw.audio_file as string) || null,
   order: (raw.order as number) ?? 0,
 });
 export const songsResource: ResourceConfig = {
@@ -262,7 +273,20 @@ export const songsResource: ResourceConfig = {
       name: "youtube_id",
       label: L("YouTube ID", "YouTube ID"),
       type: "text",
-      help: L("Acha wazi kama bado hakijapakiwa", "Leave blank if not uploaded yet"),
+      help: L(
+        "Ikiwepo, wimbo utachezwa kutoka YouTube kwenye tovuti",
+        "If set, the song plays from YouTube on the site"
+      ),
+    },
+    {
+      name: "audio_file",
+      label: L("Faili la Sauti (MP3/M4A)", "Audio File (MP3/M4A)"),
+      type: "file",
+      accept: "audio/*",
+      help: L(
+        "Inatumika kama hakuna YouTube ID — watu wataweza kupakua",
+        "Used when there's no YouTube ID — visitors can download it"
+      ),
     },
     { name: "order", label: L("Mpangilio", "Order"), type: "number" },
   ],

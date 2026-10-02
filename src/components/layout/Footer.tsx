@@ -18,13 +18,19 @@ export function Footer() {
     { href: "/kuhusu-sisi/kalenda", label: ui.navCalendar[lang] },
     { href: "/nyimbo", label: ui.navSongs[lang] },
     { href: "/habari-na-matukio", label: ui.navNews[lang] },
+  ];
+
+  const resourceLinks = [
+    { href: "/kuhusu-sisi/wanakwaya", label: ui.navMembers[lang] },
+    { href: "/kuhusu-sisi/uongozi", label: ui.navLeadership[lang] },
+    { href: "/katiba-na-kanuni", label: ui.navConstitution[lang] },
     { href: "/gallery", label: ui.navGallery[lang] },
   ];
 
   return (
     <footer className="grain-overlay mt-auto bg-ink text-cream/80">
       <div className="rule-gold" />
-      <div className="mx-auto grid max-w-6xl grid-cols-1 gap-10 px-5 py-16 sm:px-8 md:grid-cols-4">
+      <div className="mx-auto grid max-w-6xl grid-cols-1 gap-10 px-5 py-16 sm:px-8 md:grid-cols-5">
         <div className="md:col-span-2">
           <div className="flex items-center gap-3">
             <Image src={site.logo} alt={site.name[lang]} width={52} height={52} className="rounded-full ring-2 ring-brand-gold/50" />
@@ -63,6 +69,21 @@ export function Footer() {
           </p>
           <ul className="space-y-2 text-sm">
             {quickLinks.map((link) => (
+              <li key={link.href}>
+                <Link href={link.href} className="transition hover:text-cream">
+                  {link.label}
+                </Link>
+              </li>
+            ))}
+          </ul>
+        </div>
+
+        <div>
+          <p className="mb-4 text-sm font-semibold uppercase tracking-wide text-brand-gold">
+            {ui.navResources[lang]}
+          </p>
+          <ul className="space-y-2 text-sm">
+            {resourceLinks.map((link) => (
               <li key={link.href}>
                 <Link href={link.href} className="transition hover:text-cream">
                   {link.label}

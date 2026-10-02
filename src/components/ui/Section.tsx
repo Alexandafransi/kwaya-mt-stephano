@@ -21,27 +21,34 @@ export function SectionHeading({
   title,
   subtitle,
   center = false,
+  dark = false,
 }: {
   eyebrow?: string;
   title: string;
   subtitle?: string;
   center?: boolean;
+  // For permanently-dark bands (hero/footer-style "fixed brand chrome").
+  dark?: boolean;
 }) {
   return (
     <div className={`mb-12 ${center ? "text-center" : ""}`}>
       {eyebrow && (
         <div className={`mb-4 flex items-center gap-3 ${center ? "justify-center" : ""}`}>
           <span className="h-px w-8 bg-brand-gold" />
-          <p className="text-sm font-semibold uppercase tracking-[0.25em] text-brand-orange-dark">
+          <p className={`text-sm font-semibold uppercase tracking-[0.25em] ${dark ? "text-brand-gold" : "text-brand-orange-dark"}`}>
             {eyebrow}
           </p>
         </div>
       )}
-      <h2 className="font-serif-display text-3xl font-bold tracking-tight text-balance text-content sm:text-4xl">
+      <h2
+        className={`font-serif-display text-3xl font-bold tracking-tight text-balance sm:text-4xl ${dark ? "text-cream" : "text-content"}`}
+      >
         {title}
       </h2>
       {subtitle && (
-        <p className={`mt-4 text-lg text-content-soft/70 ${center ? "mx-auto max-w-2xl" : "max-w-2xl"}`}>
+        <p
+          className={`mt-4 text-lg ${dark ? "text-cream/60" : "text-content-soft/70"} ${center ? "mx-auto max-w-2xl" : "max-w-2xl"}`}
+        >
           {subtitle}
         </p>
       )}

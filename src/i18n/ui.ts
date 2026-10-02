@@ -76,6 +76,18 @@ export const ui = {
   },
   viewForm: { sw: "Angalia Fomu", en: "View Form" },
   downloadForm: { sw: "Pakua Fomu", en: "Download Form" },
+
+  // Homepage: stat badges + join-us band
+  yearsOfService: { sw: "Miaka ya Huduma", en: "Years of Service" },
+  songsLabel: { sw: "Nyimbo", en: "Songs" },
+  joinChoir: { sw: "Jiunge na Kwaya", en: "Join the Choir" },
+  joinChoirDesc: {
+    sw: "Je, unapenda kuimba na kuitumikia Kanisa kwa karama ya muziki? Pakua fomu ya usajili, ijaze, kisha uiwasilishe kwa viongozi wetu kuanza safari yako nasi.",
+    en: "Do you love to sing and serve the Church through the gift of music? Download the registration form, fill it out, and submit it to our leaders to begin your journey with us.",
+  },
+  startJourney: { sw: "Anza Safari Yako", en: "Start Your Journey" },
+
+  downloadSong: { sw: "Pakua Wimbo", en: "Download Song" },
 } satisfies Record<string, Bilingual>;
 
 export type UIKey = keyof typeof ui;

@@ -411,7 +411,7 @@ function FieldInput({
         )}
         <input
           type="file"
-          accept={field.type === "image" ? "image/*" : undefined}
+          accept={field.accept ?? (field.type === "image" ? "image/*" : undefined)}
           className={styles.formInput}
           onChange={(e) => {
             const file = e.target.files?.[0];

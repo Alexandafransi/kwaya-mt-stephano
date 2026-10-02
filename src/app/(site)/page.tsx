@@ -3,7 +3,7 @@
 import Image from "next/image";
 import Link from "next/link";
 import { useMemo } from "react";
-import { ArrowRight, CalendarDays, Music4, Newspaper, Images } from "lucide-react";
+import { ArrowRight, CalendarDays, Download, Music4, Newspaper, Images, Users } from "lucide-react";
 import { useLanguage } from "@/i18n/LanguageProvider";
 import { ui } from "@/i18n/ui";
 import { useSiteData } from "@/site/SiteDataProvider";
@@ -12,15 +12,18 @@ import {
   adaptNews,
   adaptSongCategory,
   adaptCalendarEvent,
+  adaptMember,
   newsResource,
   songCategoriesResource,
   calendarResource,
+  membersResource,
   groupCalendarEvents,
 } from "@/lib/resources";
 import { getUpcomingEvents } from "@/lib/calendar-utils";
 import { Container } from "@/components/ui/Container";
 import { Section, SectionHeading } from "@/components/ui/Section";
-import { Card } from "@/components/ui/Card";
+import { Card, CardIcon } from "@/components/ui/Card";
+import { AccentCard } from "@/components/ui/AccentCard";
 import { Button } from "@/components/ui/Button";
 import { Reveal } from "@/components/ui/Reveal";
 import { Divider } from "@/components/ui/Divider";
@@ -31,6 +34,7 @@ export default function Home() {
   const { data: news } = useList(newsResource.key, adaptNews);
   const { data: songCategories } = useList(songCategoriesResource.key, adaptSongCategory);
   const { data: calendarEvents } = useList(calendarResource.key, adaptCalendarEvent);
+  const { data: members } = useList(membersResource.key, adaptMember);
 
   const now = useMemo(() => new Date(), []);
   const calendarYear = calendarEvents[0]?.year ?? now.getFullYear();
@@ -40,6 +44,14 @@ export default function Home() {
     [calendarMonths, calendarYear, now]
   );
   const latestNews = [...news].sort((a, b) => (a.date < b.date ? 1 : -1)).slice(0, 3);
+  const totalSongs = songCategories.reduce((sum, c) => sum + c.songs.length, 0);
+  const yearsOfService = site.founded ? now.getFullYear() - site.founded : 0;
+
+  const stats = [
+    { icon: Users, value: `${members.length}+`, label: ui.navMembers[lang] },
+    { icon: CalendarDays, value: `${yearsOfService}+`, label: ui.yearsOfService[lang] },
+    { icon: Music4, value: `${totalSongs}+`, label: ui.songsLabel[lang] },
+  ];
 
   const quickLinks = [
     { href: "/kuhusu-sisi/utangulizi", icon: Newspaper, label: ui.navAbout[lang] },
@@ -59,7 +71,7 @@ export default function Home() {
               "radial-gradient(circle at 15% 10%, rgba(232,185,35,0.22), transparent 50%), radial-gradient(circle at 85% 90%, rgba(217,114,12,0.22), transparent 50%)",
           }}
         />
-        <Container className="relative grid grid-cols-1 items-center gap-14 py-24 sm:py-28 lg:grid-cols-2 lg:py-32">
+        <Container className="relative grid grid-cols-1 items-center gap-14 pb-16 pt-24 sm:pb-20 sm:pt-28 lg:grid-cols-2 lg:pt-32">
           <div className="animate-fade-in-up">
             <div className="mb-5 flex items-center gap-3">
               <span className="h-px w-8 bg-brand-gold" />
@@ -109,63 +121,96 @@ export default function Home() {
             </div>
           </div>
         </Container>
+
+        <Container className="relative pb-16 sm:pb-20">
+          <div className="grid grid-cols-3 gap-4 border-t border-cream/10 pt-10 sm:gap-8">
+            {stats.map(({ icon: Icon, value, label }, i) => (
+              <Reveal key={label} delay={i * 0.06}>
+                <div className="flex items-center gap-3 sm:gap-4">
+                  <div className="hidden h-11 w-11 shrink-0 items-center justify-center rounded-full border border-brand-gold/30 bg-brand-gold/10 text-brand-gold sm:flex">
+                    <Icon size={20} />
+                  </div>
+                  <div>
+                    <p className="font-serif-display text-2xl font-bold text-cream sm:text-3xl">{value}</p>
+                    <p className="text-xs text-cream/50 sm:text-sm">{label}</p>
+                  </div>
+                </div>
+              </Reveal>
+            ))}
+          </div>
+        </Container>
       </section>
 
       {/* Quick links */}
-      <Section className="!py-10">
-        <div className="grid grid-cols-2 gap-4 sm:grid-cols-4">
-          {quickLinks.map(({ href, icon: Icon, label }, i) => (
-            <Reveal key={href} delay={i * 0.05}>
-              <Link href={href}>
-                <Card className="flex flex-col items-center gap-3 py-8 text-center hover:border-brand-orange/30">
-                  <div className="flex h-12 w-12 items-center justify-center rounded-full bg-brand-orange/10 text-brand-orange-dark">
-                    <Icon size={22} />
-                  </div>
-                  <span className="text-sm font-semibold text-content">{label}</span>
-                </Card>
-              </Link>
-            </Reveal>
-          ))}
-        </div>
-      </Section>
+      <section className="relative overflow-hidden">
+        <div
+          className="pointer-events-none absolute inset-0"
+          style={{
+            backgroundImage:
+              "radial-gradient(circle at 12% 0%, rgba(232,185,35,0.08), transparent 45%), radial-gradient(circle at 90% 100%, rgba(217,114,12,0.06), transparent 45%)",
+          }}
+        />
+        <Container className="relative py-10">
+          <div className="grid grid-cols-2 gap-4 sm:grid-cols-4">
+            {quickLinks.map(({ href, icon: Icon, label }, i) => (
+              <Reveal key={href} delay={i * 0.05}>
+                <Link href={href}>
+                  <Card className="flex flex-col items-center gap-3 py-8 text-center hover:border-brand-orange/30">
+                    <CardIcon className="h-12 w-12">
+                      <Icon size={22} />
+                    </CardIcon>
+                    <span className="text-sm font-semibold text-content">{label}</span>
+                  </Card>
+                </Link>
+              </Reveal>
+            ))}
+          </div>
+        </Container>
+      </section>
 
-      <Divider />
-
-      {/* Upcoming events */}
-      <Section>
-        <Reveal>
-          <SectionHeading
-            eyebrow={ui.navCalendar[lang]}
-            title={ui.upcomingEvents[lang]}
-            subtitle={
-              lang === "sw"
-                ? "Matukio kutoka kwenye kalenda rasmi ya mwaka 2026 ya kwaya."
-                : "Events from the choir's official 2026 calendar."
-            }
-          />
-        </Reveal>
-        <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
-          {upcoming.map((event, i) => (
-            <Reveal key={`${event.monthName.en}-${event.date}-${i}`} delay={i * 0.05}>
-              <Card className="h-full">
-                <p className="font-serif-display text-3xl font-bold text-brand-orange-dark">
-                  {event.date}
-                </p>
-                <p className="text-xs font-semibold uppercase tracking-wide text-content-soft/60">
-                  {event.monthName[lang]}
-                </p>
-                <p className="mt-3 text-sm font-medium text-content">{event.title[lang]}</p>
-              </Card>
-            </Reveal>
-          ))}
-        </div>
-        <div className="mt-8 text-center">
-          <Button href="/kuhusu-sisi/kalenda" variant="ghost" className="!text-content border-content/15 hover:!bg-content/5">
-            {ui.viewAll[lang]}
-            <ArrowRight size={16} />
-          </Button>
-        </div>
-      </Section>
+      {/* Upcoming events — dark band for visual rhythm against the cream sections */}
+      <section className="grain-overlay relative overflow-hidden bg-ink py-16 sm:py-24">
+        <div
+          className="pointer-events-none absolute inset-0 opacity-40"
+          style={{
+            backgroundImage:
+              "radial-gradient(circle at 85% 15%, rgba(232,185,35,0.16), transparent 50%), radial-gradient(circle at 10% 90%, rgba(217,114,12,0.16), transparent 50%)",
+          }}
+        />
+        <Container className="relative">
+          <Reveal>
+            <SectionHeading
+              dark
+              eyebrow={ui.navCalendar[lang]}
+              title={ui.upcomingEvents[lang]}
+              subtitle={
+                lang === "sw"
+                  ? `Matukio kutoka kwenye kalenda rasmi ya mwaka ${calendarYear} ya kwaya.`
+                  : `Events from the choir's official ${calendarYear} calendar.`
+              }
+            />
+          </Reveal>
+          <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
+            {upcoming.map((event, i) => (
+              <Reveal key={`${event.monthName.en}-${event.date}-${i}`} delay={i * 0.05}>
+                <AccentCard dark tone="gold" className="h-full">
+                  <p className="font-serif-display text-3xl font-bold text-brand-gold">{event.date}</p>
+                  <p className="text-xs font-semibold uppercase tracking-wide text-cream/50">
+                    {event.monthName[lang]}
+                  </p>
+                  <p className="mt-3 text-sm font-medium text-cream/90">{event.title[lang]}</p>
+                </AccentCard>
+              </Reveal>
+            ))}
+          </div>
+          <div className="mt-8 text-center">
+            <Button href="/kuhusu-sisi/kalenda" variant="ghost">
+              {ui.viewAll[lang]}
+              <ArrowRight size={16} />
+            </Button>
+          </div>
+        </Container>
+      </section>
 
       {/* Latest news */}
       <Section className="bg-surface-alt/60">
@@ -177,14 +222,19 @@ export default function Home() {
             <Reveal key={item.slug} delay={i * 0.05}>
               <Link href={`/habari-na-matukio/${item.slug}`}>
                 <Card className="h-full">
-                  <p className="text-xs font-semibold uppercase tracking-wide text-brand-orange-dark">
-                    {new Date(item.date).toLocaleDateString(lang === "sw" ? "sw-TZ" : "en-US", {
-                      year: "numeric",
-                      month: "long",
-                      day: "numeric",
-                    })}
-                  </p>
-                  <p className="mt-2 font-serif-display text-lg font-semibold text-content">
+                  <div className="flex items-center gap-2">
+                    <span className="rounded-full bg-brand-orange/10 px-2.5 py-0.5 text-[11px] font-semibold uppercase tracking-wide text-brand-orange-dark">
+                      {lang === "sw" ? "Habari" : "News"}
+                    </span>
+                    <p className="text-xs font-medium text-content-soft/60">
+                      {new Date(item.date).toLocaleDateString(lang === "sw" ? "sw-TZ" : "en-US", {
+                        year: "numeric",
+                        month: "long",
+                        day: "numeric",
+                      })}
+                    </p>
+                  </div>
+                  <p className="mt-3 font-serif-display text-lg font-semibold text-content">
                     {item.title[lang]}
                   </p>
                   <p className="mt-2 text-sm text-content-soft/70">{item.excerpt[lang]}</p>
@@ -199,35 +249,79 @@ export default function Home() {
       </Section>
 
       {/* Songs teaser */}
-      <Section>
-        <Reveal>
-          <SectionHeading
-            eyebrow={ui.navSongs[lang]}
-            title={ui.navSongs[lang]}
-            subtitle={
-              lang === "sw"
-                ? "Vikundi vya nyimbo za ibada, zinazopakiwa hatua kwa hatua."
-                : "Categories of worship songs, being uploaded progressively."
-            }
-          />
-        </Reveal>
-        <div className="grid grid-cols-2 gap-4 sm:grid-cols-3 lg:grid-cols-5">
-          {songCategories.slice(0, 5).map((cat, i) => (
-            <Reveal key={cat.slug} delay={i * 0.05}>
-              <Link href={`/nyimbo/${cat.slug}`}>
-                <Card className="flex h-full flex-col items-center gap-2 py-6 text-center">
-                  <Music4 size={20} className="text-brand-orange-dark" />
-                  <span className="text-sm font-semibold text-content">{cat.name[lang]}</span>
-                </Card>
-              </Link>
-            </Reveal>
-          ))}
-        </div>
-        <div className="mt-8 text-center">
-          <Button href="/nyimbo" variant="ghost" className="!text-content border-content/15 hover:!bg-content/5">
-            {ui.viewAll[lang]}
-            <ArrowRight size={16} />
-          </Button>
+      <section className="relative overflow-hidden">
+        <div
+          className="pointer-events-none absolute inset-0"
+          style={{
+            backgroundImage:
+              "radial-gradient(circle at 88% 10%, rgba(232,185,35,0.08), transparent 45%), radial-gradient(circle at 5% 95%, rgba(217,114,12,0.07), transparent 45%)",
+          }}
+        />
+        <Container className="relative py-16 sm:py-24">
+          <Reveal>
+            <SectionHeading
+              eyebrow={ui.navSongs[lang]}
+              title={ui.navSongs[lang]}
+              subtitle={
+                lang === "sw"
+                  ? "Vikundi vya nyimbo za ibada, zinazopakiwa hatua kwa hatua."
+                  : "Categories of worship songs, being uploaded progressively."
+              }
+            />
+          </Reveal>
+          <div className="grid grid-cols-2 gap-4 sm:grid-cols-3 lg:grid-cols-5">
+            {songCategories.slice(0, 5).map((cat, i) => (
+              <Reveal key={cat.slug} delay={i * 0.05}>
+                <Link href={`/nyimbo/${cat.slug}`}>
+                  <Card className="flex h-full flex-col items-center gap-3 py-6 text-center">
+                    <CardIcon className="h-11 w-11">
+                      <Music4 size={20} />
+                    </CardIcon>
+                    <span className="text-sm font-semibold text-content">{cat.name[lang]}</span>
+                  </Card>
+                </Link>
+              </Reveal>
+            ))}
+          </div>
+          <div className="mt-8 text-center">
+            <Button href="/nyimbo" variant="ghost" className="!text-content border-content/15 hover:!bg-content/5">
+              {ui.viewAll[lang]}
+              <ArrowRight size={16} />
+            </Button>
+          </div>
+        </Container>
+      </section>
+
+      {/* Join us — asymmetric CTA band */}
+      <Section className="bg-surface-alt/60">
+        <div className="grid grid-cols-1 items-center gap-10 lg:grid-cols-5">
+          <Reveal className="lg:col-span-3">
+            <p className="mb-4 text-sm font-semibold uppercase tracking-[0.25em] text-brand-orange-dark">
+              {ui.startJourney[lang]}
+            </p>
+            <h2 className="font-serif-display text-3xl font-bold tracking-tight text-balance text-content sm:text-4xl">
+              {ui.joinChoir[lang]}
+            </h2>
+            <p className="mt-4 max-w-xl text-content-soft/70">{ui.joinChoirDesc[lang]}</p>
+          </Reveal>
+          <Reveal delay={0.1} className="flex flex-col gap-3 lg:col-span-2 lg:items-end">
+            <a
+              href={site.registrationFormPdf}
+              target="_blank"
+              rel="noreferrer"
+              className="inline-flex w-full items-center justify-center gap-2 rounded-full bg-brand-orange px-7 py-3.5 text-sm font-semibold text-white shadow-lg shadow-brand-orange/20 transition duration-300 hover:-translate-y-0.5 hover:bg-brand-orange-dark hover:shadow-xl hover:shadow-brand-orange/25 sm:w-auto"
+            >
+              <Download size={16} />
+              {ui.downloadForm[lang]}
+            </a>
+            <Link
+              href="/kuhusu-sisi/wanakwaya"
+              className="inline-flex w-full items-center justify-center gap-2 rounded-full border border-content/15 px-7 py-3.5 text-sm font-semibold text-content transition duration-300 hover:-translate-y-0.5 hover:border-brand-orange/40 hover:bg-content/5 sm:w-auto"
+            >
+              {ui.navMembers[lang]}
+              <ArrowRight size={16} />
+            </Link>
+          </Reveal>
         </div>
       </Section>
 

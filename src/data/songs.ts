@@ -3,6 +3,7 @@ import type { Bilingual } from "@/i18n/types";
 export type Song = {
   title: string;
   youtubeId: string | null;
+  audioFile?: string | null;
 };
 
 export type SongCategory = {
