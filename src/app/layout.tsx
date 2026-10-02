@@ -11,9 +11,11 @@ const THEME_INIT_SCRIPT = `
 (function () {
   try {
     var stored = localStorage.getItem("kwaya-theme");
-    var theme = stored === "dark" || stored === "light"
-      ? stored
-      : (window.matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light");
+    // Light is the site's default look. A visitor who has actually chosen a
+    // theme keeps that choice; the OS setting is deliberately NOT followed,
+    // so someone whose device is in dark mode still lands on the light
+    // design rather than a dark page they never asked for.
+    var theme = stored === "dark" || stored === "light" ? stored : "light";
     document.documentElement.setAttribute("data-theme", theme);
   } catch (e) {}
 })();
