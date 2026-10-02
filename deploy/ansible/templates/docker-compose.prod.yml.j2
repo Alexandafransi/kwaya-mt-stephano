@@ -1,0 +1,21 @@
+# Rendered by Ansible — do not edit on the server, changes will be overwritten.
+services:
+  web:
+    image: ${IMAGE}
+    restart: unless-stopped
+    # Loopback only, for the deploy health check; public traffic arrives
+    # through Traefik on the proxy network.
+    ports:
+      - "127.0.0.1:3020:3000"
+    networks:
+      - proxy
+    labels:
+      - traefik.enable=true
+      - traefik.http.routers.kwaya-app.rule=Host(`{{ app_domain }}`) || Host(`www.{{ app_domain }}`)
+      - traefik.http.routers.kwaya-app.entrypoints=websecure
+      - traefik.http.routers.kwaya-app.tls.certresolver=letsencrypt
+      - traefik.http.services.kwaya-app.loadbalancer.server.port=3000
+
+networks:
+  proxy:
+    external: true
